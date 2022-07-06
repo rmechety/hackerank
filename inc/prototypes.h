@@ -13,19 +13,7 @@
 // clang-format off
 #ifndef PROTOTYPES_H
 # define PROTOTYPES_H
-
-#include <climits>
-#include <cmath>
-#include <float.h>
-#include <iostream>
-#include <unistd.h>
-#include <vector>
-using namespace std;
-
-typedef vector<vector<int> > matrix;
-typedef vector<vector<string> > matrix_moves;
-typedef vector<string > t_board;
-typedef vector<pair<int, int> > matrix_pos;
+#include "define.hpp"
 // clang-format on
 /* -------------------------------------------------------------------------- */
 /*                          FILE = src/botclean.cpp                           */

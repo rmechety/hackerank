@@ -1,4 +1,4 @@
-#include "prototypes.h"
+#include "botclean.hpp"
 
 double dst(int ax, int ay, int bx, int by)
 {
@@ -46,10 +46,6 @@ bool is_dirty(const vector<string> &board)
 
 matrix_pos get_dirty(const vector<string> &board)
 {
-	// retourne les positions des dirty
-	// std::cerr << __FUNCTION__ << " : ENTER" << std::endl;
-	// std::cerr << __FUNCTION__ << " : BOARD" << std::endl;
-	print_board(board);
 	vector<pair<int, int>> dirty;
 	int i = 0;
 	int s = board.size();
@@ -62,7 +58,6 @@ matrix_pos get_dirty(const vector<string> &board)
 		}
 		i++;
 	}
-	// std::cerr << __FUNCTION__ << " : EXT" << std::endl;
 	return dirty;
 }
 
@@ -78,13 +73,15 @@ string get_move(int const &bot_c, int const &bot_r, int const &dirt_c, int const
 		(bot_c > dirt_c) ? move = 2 : move = 3;
 	return instruction[move];
 };
-void change_pos(string &move, int &c, int &r)
-{
-	(move == "UP") ? r-- : 0;
-	(move == "DOWN") ? r++ : 0;
-	(move == "LEFT") ? c-- : 0;
-	(move == "RIGHT") ? c++ : 0;
-}
+
+
+
+
+
+// void change_pos(string &move, int &c, int &r)
+// {
+// 	(move == "LEFT") ? c-- : 0;
+// }
 
 vector<string> get_min_move(const vector<vector<string>> &next_move)
 {
@@ -136,7 +133,7 @@ class possibility
   private:
 	char move;
 	possibility *prev;
-	possibility *next;
+	vector<possibility *>next;
 
   public:
 	possibility(char move, possibility *prev, possibility *next)
@@ -166,6 +163,33 @@ class possibility
 			change_pos(inst[i], ret.c, ret.r);
 		}
 	};
+	possibility *create_possibility(char move)
+	{(
+		possibility * created = new possibility(move,this,nullptr); 
+		return created;
+	}
+	possibility *add_possibilty(possibility * to_add)
+	{
+		next.push_back(to_add);
+		return to_add;
+	};
+	possibility *create_add_possibilty(char move)
+	{
+		possibility * c = create_possibility();
+
+		add_possibilty(c);
+
+		return c;	
+		
+	};
+	void remove_possibility(possibility *to_remove)
+	{
+		vector<possibility *>::iterator it_erase = std::find(next.begin(),next.end(),to_remove);
+		if(it_erase != next.end())
+			next.erase(it_erase);		
+		return;
+	}
+
 };
 
 // generation par etage
