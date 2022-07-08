@@ -138,7 +138,7 @@ class possibility
   public:
 	possibility(char move, possibility *prev, possibility *next)
 		: move(move), prev(prev), next(next){};
-	~possibility();
+	~possibility(){};
 	char get_move()
 	{
 		return move;
@@ -162,10 +162,11 @@ class possibility
 		{
 			change_pos(inst[i], ret.c, ret.r);
 		}
+		return ret;
 	};
 	possibility *create_possibility(char move)
-	{(
-		possibility * created = new possibility(move,this,nullptr); 
+	{
+		possibility * created = new possibility(move,this,nullptr);
 		return created;
 	}
 	possibility *add_possibilty(possibility * to_add)
@@ -179,27 +180,103 @@ class possibility
 
 		add_possibilty(c);
 
-		return c;	
-		
+		return c;
+
 	};
 	void remove_possibility(possibility *to_remove)
 	{
 		vector<possibility *>::iterator it_erase = std::find(next.begin(),next.end(),to_remove);
 		if(it_erase != next.end())
-			next.erase(it_erase);		
+			next.erase(it_erase);
 		return;
 	}
+	// methode qui affiche la board grace a get_board
+	void print_board(t_board &board)
+	{
+		vector<string> board_to_print = get_board(board).board;
+		print_board(board_to_print);
+	}
+	bool is_resolved(t_board &board)
+	{
+		t_board nboard = get_board(board);
+
+		for(int i = 0, i < nboard.size(),i++)
+		{
+			if (nboard[i].find("d") != string::npos)
+				return false;
+		}
+		return true;
+	}
+
 
 };
 
-// generation par etage
-vector<string> generate_next_move(t_board &board)
+
+pair<int ,int > get_bot_pos(t_board &board)
 {
+	for (size_t i = 0; i < count; i++)
+	{
+		int pos = board[i].find("b");
+
+		if (pos != string::npos)
+			return make_pair(pos,i);
+
+	}
+	return make_pair(-1,-1);
+}
+
+vector<char> possible_next_move(t_board &board)
+{
+	vector<pair<int,int> > dirtys = get_dirty(board);
+	bool moves [] = {0,0,0,0};
+	pair<int,int> bot_pos = get_bot_pos(board);
+	for (int i = 0; i < dritys.size(); i++)
+	{
+		char m = get_move(bot_pos.first,bot_pos.second,dirtys[i].first,dirtys[i].first);
+		moves[m] = 1;
+	}
+	vector<char> ret;
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (moves[i] == 1)
+			ret.push_back(i);
+	}
+	return moves;
+}
+
+//
+
+// generation par etage
+vector<char> generate_next_move(t_board &board)
+{
+	vector<possibility> poss;
 	while (is_solution)
 	{
-		// vecteur de vecteur de string
-		// chaque string est un move
-		// boucler sur
+		vector<possibility *> next_generation;
+		for (size_t i = 0; i < poss.size(); i++)
+		{
+			if (poss[i].is_resolved())
+			{
+				return poss[i].get_inst();
+			}
+			else
+			{
+				vector<char> possible_next_mv = possible_next_move(board);// generer les prochains moves
+
+				for (size_t j = 0; j < possible_next_mv.size(); j++)
+				{
+					poss[i].create_add_possibility(possible_next_mv[j]);
+
+				}
+				for (size_t j = 0; j < poss[j].next.size(); j++)
+				{
+					next_generation.push_back(poss[i].next[j]);
+				}
+
+
+			}
+		}
+
 	}
 }
 
@@ -282,4 +359,15 @@ int main(void)
 	}
 	next_move(pos[0], pos[1], board);
 	return 0;
+}
+
+
+// req contient vector<string> de move appeler req.moves et une t_board req.board
+// faire une fonction qui afficher la board apres chaque move
+void print_every_step(){
+	for (vector<string>::iterator it = req.moves.begin(); it != req.moves.end(); it++)
+	{
+		change_pos(*it, req.c, req.r);
+		print_board(req.board);
+	}
 }
